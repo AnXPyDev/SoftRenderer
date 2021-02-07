@@ -8,13 +8,13 @@ Although I've learned a lot about graphics and got the basics of a renderer down
 
 ## TODO (maybe)
 
-Improve performance by splitting the workload to multiple threads.
-Fix rasterizeLine function to render only inside the pixelbuffer.
+* Improve performance by splitting the workload to multiple threads.
+* Fix rasterizeLine function to render only inside the pixelbuffer.
 
 ## Compiling
 
 If you decide to run this, the dependencies are *a c++20 compiler*, *meson* and *SDL2*.
-1. Clone this repository, *cd* into the directory.
-2. *meson build --buildtype release*
-3. *cd build*
-4. *meson compile*
+1. Clone this repository, `cd` into the directory.
+2. `$ meson build --buildtype release`
+3. `$ cd build`
+4. `$ meson compile`
