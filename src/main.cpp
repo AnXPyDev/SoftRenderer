@@ -23,7 +23,7 @@ Angle lerp(Angle x, Angle y, Float m) {
 }
 
 int main(int argc, char** argv) {
-  sdl::App app("cgl test", {800, 400});
+  sdl::App app("cgl test", {400, 400});
   sdl::Renderer ctx(app);
 
   std::vector<std::tuple<Color, Vector, Vector>> lines;
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
   app.tps = 60;
 
 
-  Vector campos = {-5000, 0, 0};
+  Vector campos = {-500, 0, 0};
   Angle2 camrot = {0,0};
   Float camdist = 200;
 
@@ -113,6 +113,8 @@ int main(int argc, char** argv) {
     }
   };
 
+  Angle2 object_rotation = {Angle(0), Angle(0)};
+  RotationMatrix obj_rotmax;
 
   app.tick_fn = [&]() {
     Timer timer("tick");
@@ -121,29 +123,32 @@ int main(int argc, char** argv) {
     cam.origin.y = std::lerp(cam.origin.y, campos.y, ls);
     cam.origin.z = std::lerp(cam.origin.z, campos.z, ls);
     cam.distance = std::lerp(cam.distance, camdist, ls);
+    object_rotation.latitude += 0.01;
+    object_rotation.longitude += 0.005;
+    obj_rotmax = RotationMatrix(object_rotation);
     //cam.direction.latitude = lerp(cam.direction.latitude, camrot.latitude, ls);
     //cam.direction.longitude = lerp(cam.direction.longitude, camrot.longitude, ls);
   };
 
   app.tick_fn();
   
-  PixelBuffer pixelbuffer = {app, {200,100}};
-  Viewport viewport = {Vector({0, 0, 0}), Vector({800, 400, 0}), Vector({1, 1, 0})};
+  PixelBuffer pixelbuffer = {app, {200,200}};
+  Viewport viewport = {Vector({0, 0, 0}), Vector({400, 400, 0}), Vector({1, 1, 0})};
 
   app.rasterize_fn = [&]() {
     Timer timer("rasterize");
     pixelbuffer.clear();
 
-    for (int x = 0; x <= 1; x++) {
-      for (int y = 0; y <= 1; y++) {
+    for (int x = 0; x <= 0; x++) {
+      for (int y = 0; y <= 0; y++) {
         for (int z = 0; z <= 0; z++) {
           for (const auto& tup : tris) {
             Vector offset = {x * 300, y * 300, z * 300};
             const Triangle& otri = std::get<1>(tup);
             Triangle tri = {
-              otri.vertices[0] + offset,
-              otri.vertices[1] + offset,
-              otri.vertices[2] + offset,
+              (otri.vertices[0] + offset) * obj_rotmax,
+              (otri.vertices[1] + offset) * obj_rotmax,
+              (otri.vertices[2] + offset) * obj_rotmax
             };
             rasterizeTriangle(
               viewport.toPixelBuffer(cam.perspectiveProjection(tri), pixelbuffer),
